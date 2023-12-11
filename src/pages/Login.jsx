@@ -1,22 +1,47 @@
 // Login.js
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { ToastError, ToastSuccess } from "../utility/Toasts";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../Firebase";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
   const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
+    setEmail(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
 
-  const handleSignIn = () => {
-    // Implement your sign-in logic here
-    console.log("Signing in with:", username, password);
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      ToastError("Please provide all documents");
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      ToastSuccess("SignUp successfully");
+      navigate("/");
+    } catch (error) {
+      if (error.code === "auth/user-not-found") {
+        ToastError("There is no user with this email ");
+      } else if (error.code === "auth/invalid-email") {
+        ToastError("Invalid Email");
+      } else if (error.code === "auth/wrong-password") {
+        ToastError("Wrong password");
+      } else if (error.code === "auth/invalid-credential") {
+        ToastError("invalid-credential");
+      } else {
+        ToastError(" something went  Wrong,Please try again later ");
+
+        console.log(error.code, "login");
+      }
+    }
   };
 
   return (
@@ -28,14 +53,14 @@ const Login = () => {
               className="block text-white text-sm font-bold mb-2"
               htmlFor="username"
             >
-              Username
+              Email
             </label>
             <input
               className="shadow appearance-none border rounded bg-gray-800 w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:bg-gray-800"
               id="username"
               type="text"
-              placeholder="Username"
-              value={username}
+              placeholder="registed email"
+              value={email}
               onChange={handleUsernameChange}
             />
           </div>

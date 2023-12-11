@@ -11,8 +11,12 @@ import {
   Testimonials,
   Hero,
 } from "./components";
+import { UserState } from "./context/UserContext";
 
-const Home = () => (
+const Home = () => {
+  const {user,setUser}=UserState();
+  console.log(user)
+  return(
   <div className="bg-primary w-full overflow-hidden">
     <div className={`${styles.paddingX} ${styles.flexCenter}`}>
       <div className={`${styles.boxWidth}`}>
@@ -40,5 +44,5 @@ const Home = () => (
     </div>
   </div>
 );
-
+}
 export default Home;

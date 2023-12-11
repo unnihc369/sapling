@@ -1,21 +1,49 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../Firebase";
+
+// this are toast to display warnings and informations
+import { ToastError, ToastSuccess, ToastWarning } from "../utility/Toasts";
+import { ToastContainer, toast } from "react-toastify";
 
 const Signup = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [confirPassword, setConfirmPassword] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
+
   const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
+    setEmail(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
 
-  const handleSignIn = () => {
-    // Implement your sign-in logic here
-    console.log("Signing in with:", username, password);
+  
+  const handleCofirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+  };
+  const handleSignIn = async () => {
+    if (!email || !password || !confirPassword) {
+      ToastError("Please provide all documents");
+      return;
+    }
+    if (password !== confirPassword) {
+      return ToastWarning("Password missmatch");
+    }
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      ToastSuccess("SignUp successfully");
+      navigate("/");
+    } catch (error) {
+      ToastError(error.message);
+      // this for our developer usage
+      console.log(error, "singup");
+    }
   };
 
   return (
@@ -27,14 +55,14 @@ const Signup = () => {
               className="block text-white text-sm font-bold mb-2"
               htmlFor="username"
             >
-              Username
+              Email
             </label>
             <input
               className="shadow appearance-none border rounded bg-gray-800 w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:bg-gray-800"
               id="username"
-              type="text"
-              placeholder="Username"
-              value={username}
+              type="email"
+              placeholder="your Email secure with us"
+              value={email}
               onChange={handleUsernameChange}
             />
           </div>
@@ -57,6 +85,25 @@ const Signup = () => {
               Please choose a password.
             </p>
           </div>
+          {/* confirm password */}
+
+          <div className="mb-4">
+            <label
+              className="block text-white text-sm font-bold mb-2"
+              htmlFor="password"
+            >
+              Confirm Password
+            </label>
+            <input
+              className="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-white mb-3 leading-tight focus:outline-none bg-gray-800 focus:shadow-outline focus:bg-gray-800"
+              id="password"
+              type="password"
+              placeholder="******************"
+              value={confirPassword}
+              onChange={handleCofirmPasswordChange}
+            />
+          </div>
+
           <div className="flex items-center justify-between">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -67,9 +114,9 @@ const Signup = () => {
             </button>
           </div>
           <div className="mt-4">
-          <Link to="/login" className="text-white">
-            <span className="py-4">Have have an account?</span>
-          </Link>
+            <Link to="/login" className="text-white">
+              <span className="py-4">Have have an account?</span>
+            </Link>
           </div>
         </form>
         <p className="text-center text-gray-500 text-xs">
