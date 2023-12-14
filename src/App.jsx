@@ -6,10 +6,9 @@ import Farms from "./pages/Farms";
 import Farm from "./pages/Farm";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Profile from "./pages/Profile";
 
 const App = () => {
-  
-  
   
   return (
     <>
@@ -31,6 +30,7 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/farms" element={<Farms />} />
           <Route path="/farm" element={<Farm />} />
+          <Route path="/profile" element={<Profile/>} />
         </Routes>
       </BrowserRouter>
     </>
