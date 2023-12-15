@@ -7,6 +7,7 @@ import Farm from "./pages/Farm";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 
 const App = () => {
   
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/farms" element={<Farms />} />
           <Route path="/farm" element={<Farm />} />
           <Route path="/profile" element={<Profile/>} />
+          <Route path="/editpro" element={<EditProfile/>} />
         </Routes>
       </BrowserRouter>
     </>
