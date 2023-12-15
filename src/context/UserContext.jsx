@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../Firebase";
+import { auth, db } from "../Firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 const UserContext = createContext();
 
@@ -9,17 +10,38 @@ export const UserState = () => useContext(UserContext);
 
 const UserProvider = (props) => {
   const [user, setUser] = useState({});
+  const [load, setLoad] = useState(false);
+
+  const getuserInfo = async (user) => {
+    const q = query(collection(db, "users"), where("userID", "==", user.uid));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs[0].data();
+    setUser({
+      name: data.username,
+      authId: user.uid,
+      email: data.email,
+      userId: querySnapshot.docs[0].id,
+      phone: data.phone,
+      photoUrl: data.photoUrl.imageUrl,
+      address: data.address,
+      isVerified: user.emailVerified,
+      about:data.about
+    });
+  };
 
   useEffect(() => {
-    onAuthStateChanged(auth,async(userr)=>{
-      if(userr){
-        setUser(userr);
+    onAuthStateChanged(auth, async (userr) => {
+      if (userr) {
+        setUser({ authId: userr.uid, email: userr.email });
+        getuserInfo(userr);
+      }else{
+        setUser(null);
       }
-    })
-  }, [])
-  
+    });
+  }, [load]);
+
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser ,load,setLoad}}>
       {props.children}
     </UserContext.Provider>
   );

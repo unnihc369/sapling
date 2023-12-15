@@ -2,30 +2,39 @@ import { useState } from "react";
 import { motion } from 'framer-motion'
 
 import { close, logo, menu } from "../assets";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { navLinks } from "../constants";
+import { UserState } from "../context/UserContext";
 
 const Navbar = () => {
   const [active, setActive] = useState("Home");
   const [toggle, setToggle] = useState(false);
-
+   const {user}=UserState();
   return (
     <motion.nav className="w-full flex py-6 justify-between items-center navbar">
       <img src={logo} alt="hoobank" className="w-[124px] h-[32px]" />
 
-      <ul className="list-none sm:flex hidden justify-end items-center flex-1">
-        {navLinks.map((nav, index) => (
-          <li
-            key={nav.id}
-            className={`font-poppins font-normal cursor-pointer text-[16px] ${
-              active === nav.title ? "text-white" : "text-dimWhite"
-            } ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
-            onClick={() => setActive(nav.title)}
-          >
-            <a href={`#${nav.id}`}>{nav.title}</a>
+      {user ? (
+        <ul className="list-none sm:flex hidden justify-end items-center flex-1">
+          {navLinks.map((nav, index) => (
+            <li
+              key={nav.id}
+              className={`font-poppins font-normal cursor-pointer text-[16px] ${
+                active === nav.title ? "text-white" : "text-dimWhite"
+              } ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
+              onClick={() => setActive(nav.title)}
+            >
+              <a href={`/${nav.id}`}>{nav.title}</a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ul className="list-none sm:flex hidden justify-end items-center flex-1">
+          <li className="font-poppins font-normal cursor-pointer text-[16px] text-white">
+            <NavLink to={"/login"} >Login</NavLink>
           </li>
-        ))}
-      </ul>
+        </ul>
+      )}
 
       <div className="sm:hidden flex flex-1 justify-end items-center">
         <img
