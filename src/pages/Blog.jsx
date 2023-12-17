@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { UserState } from "../context/UserContext";
 import Comment from "../components/Comment";
@@ -38,7 +39,8 @@ const Blog = () => {
     } catch (error) {
       ToastError(error.message);
     }
-  };
+  }
+
 
   const [Allblogs, SetAllbogs] = useState([]);
   const getAllbogs = async (blogF) => {

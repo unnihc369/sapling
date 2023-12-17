@@ -14,7 +14,6 @@ const Profile = () => {
   const { user, setUser, SetblogFarm } = UserState();
   const [cltFarms, SetCltFarms] = useState([]);
 
- 
   const naviagete = useNavigate();
   const signOutUser = async (e) => {
     e.preventDefault();
@@ -32,7 +31,6 @@ const Profile = () => {
   };
 
   const getAllfarms = async (user) => {
-   
     if (user.isFarmer === "true") {
       const q = query(
         collection(db, "farm"),
@@ -64,11 +62,7 @@ const Profile = () => {
   };
   useEffect(() => {
     if (user.userId) {
-     
-      
       (async () => {
-       
-        
         const data = await getAllfarms(user);
         SetCltFarms(data);
       })();
@@ -144,10 +138,10 @@ const Profile = () => {
                       key={callout.data().name}
                       className="group relative"
                       style={{ cursor: "pointer" }}
-                      onClick={(e)=>{
+                      onClick={(e) => {
                         e.preventDefault();
                         SetblogFarm(callout);
-                        naviagete('/blog')
+                        naviagete("/blog");
                       }}
                     >
                       <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
