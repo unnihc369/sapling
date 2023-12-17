@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { NavLink } from "react-router-dom";
 
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Profile", href: "/profile" },
-  { name: "Farms", href: "/farms" },
 ];
 
 export default function Header() {
@@ -15,7 +15,7 @@ export default function Header() {
     <div className="bg-white">
       <header className="absolute inset-x-0 top-0 z-50">
         <nav
-          className="flex items-center justify-between p-6 lg:px-8 bg-gray-200"
+          className="flex items-center justify-between p-6 lg:px-8 bg-gray-200  bg-primary"
           aria-label="Global"
         >
           <div className="flex lg:flex-1">
@@ -36,23 +36,23 @@ export default function Header() {
           </div>
           <div className="hidden lg:flex lg:gap-x-12">
             {navigation.map((item) => (
-              <a
+              <NavLink
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className="text-sm font-semibold leading-6 text-gray-900"
               >
                 {item.name}
-              </a>
+              </NavLink>
             ))}
           </div>
-          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            <a
-              href="#"
+          {/* <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+            <NavLink
+              to="/login"
               className="text-sm font-semibold leading-6 text-gray-900"
             >
               Log in <span aria-hidden="true">&rarr;</span>
-            </a>
-          </div>
+            </NavLink>
+          </div> */}
         </nav>
         <Dialog
           as="div"
@@ -84,22 +84,22 @@ export default function Header() {
               <div className="-my-6 divide-y divide-gray-500/10">
                 <div className="space-y-2 py-6">
                   {navigation.map((item) => (
-                    <a
+                    <NavLink
                       key={item.name}
-                      href={item.href}
+                      to={item.href}
                       className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                     >
                       {item.name}
-                    </a>
+                    </NavLink>
                   ))}
                 </div>
                 <div className="py-6">
-                  <a
+                  {/* <a
                     href="#"
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                   >
                     Log in
-                  </a>
+                  </a> */}
                 </div>
               </div>
             </div>

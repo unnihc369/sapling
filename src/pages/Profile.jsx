@@ -96,11 +96,11 @@ const Profile = () => {
               {user.userId ? "Edit Profile" : "Add Info"}
             </button>
           </NavLink>
-          <NavLink to="/addFarm">
+          {user.isFarmer==="true"&&<NavLink to="/addFarm">
             <button className="btn-primary bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring focus:border-green-300">
               Add Farm
             </button>
-          </NavLink>
+          </NavLink>}
           <button
             className="btn-danger bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring focus:border-red-300"
             onClick={signOutUser}
