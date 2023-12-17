@@ -1,6 +1,29 @@
-import React from "react";
+import React,{useState} from "react";
 
 const PaymentPage = () => {
+  const [price,setPrice] = useState(2000);
+  const handleSelectChange = (e) => {
+    // Handle the selected option, you can use the selected value to determine the price
+    const selectedOption = e.target.value;
+    // You can use the selected option value to update the price accordingly
+    // For simplicity, I'm using a placeholder variable here.
+   
+    switch (selectedOption) {
+      case "oneMonth":
+        setPrice(2000);
+        break;
+      case "threeMonths":
+        setPrice(3000);
+        break;
+      case "sixMonths":
+        setPrice(5000);
+        break;
+      default:
+        price = 2000;
+        break;
+    }
+    console.log(`Selected option: ${selectedOption}, Price: $${price}`);
+  };
   return (
     <div className="relative mx-auto w-full bg-white">
       <div className="grid min-h-screen grid-cols-10">
@@ -89,6 +112,24 @@ const PaymentPage = () => {
                   </div>
                 </div>
               </div>
+              <div className="mr-6 my-1">
+                <p className="text-xs font-semibold text-gray-500">
+                  Subscription Duration
+                </p>
+                <label htmlFor="subscription-duration" className="sr-only">
+                  Select subscription duration
+                </label>
+                <select
+                  name="subscription-duration"
+                  id="subscription-duration"
+                  onChange={handleSelectChange}
+                  className="cursor-pointer rounded border-gray-300 bg-gray-50 py-3 px-2 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500"
+                >
+                  <option value="oneMonth">One Month</option>
+                  <option value="threeMonths">Three Months</option>
+                  <option value="sixMonths">Six Months</option>
+                </select>
+              </div>
               <div>
                 <label htmlFor="card-name" className="sr-only">
                   Card name
@@ -130,58 +171,15 @@ const PaymentPage = () => {
             <div className="absolute inset-0 h-full w-full bg-gradient-to-t from-teal-800 to-teal-400 opacity-95"></div>
           </div>
           <div className="relative">
-            <ul className="space-y-5">
-              <li className="flex justify-between">
-                <div className="inline-flex">
-                  <img
-                    src="https://images.unsplash.com/photo-1620331311520-246422fd82f9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGhhaXIlMjBkcnllcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                    alt=""
-                    className="max-h-16"
-                  />
-                  <div className="ml-3">
-                    <p className="text-base font-semibold text-white">
-                      Nano Titanium Hair Dryer
-                    </p>
-                    <p className="text-sm font-medium text-white text-opacity-80">
-                      Pdf, doc Kindle
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm font-semibold text-white">$260.00</p>
-              </li>
-              <li className="flex justify-between">
-                <div className="inline-flex">
-                  <img
-                    src="https://images.unsplash.com/photo-1621607512214-68297480165e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjV8fGhhaXIlMjBkcnllcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                    alt=""
-                    className="max-h-16"
-                  />
-                  <div className="ml-3">
-                    <p className="text-base font-semibold text-white">
-                      Luisia H35
-                    </p>
-                    <p className="text-sm font-medium text-white text-opacity-80">
-                      Hair Dryer
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm font-semibold text-white">$350.00</p>
-              </li>
-            </ul>
-            <div className="my-5 h-0.5 w-full bg-white bg-opacity-30"></div>
             <div className="space-y-2">
               <p className="flex justify-between text-lg font-bold text-white">
                 <span>Total price:</span>
-                <span>$510.00</span>
-              </p>
-              <p className="flex justify-between text-sm font-medium text-white">
-                <span>Vat: 10%</span>
-                <span>$55.00</span>
+                <span>{price}</span>
               </p>
             </div>
           </div>
           <div className="relative mt-10 text-white">
-            <h3 className="mb-5 text-lg font-bold">Support</h3>
+            <h3 className="mb-2 text-lg font-bold">Support</h3>
             <p className="text-sm font-semibold">
               +01 653 235 211{" "}
               <span className="font-light">(International)</span>
@@ -191,16 +189,6 @@ const PaymentPage = () => {
             </p>
             <p className="mt-2 text-xs font-medium">
               Call us now for payment-related issues
-            </p>
-          </div>
-          <div className="relative mt-10 flex">
-            <p className="flex flex-col">
-              <span className="text-sm font-bold text-white">
-                Money Back Guarantee
-              </span>
-              <span className="text-xs font-medium text-white">
-                within 30 days of purchase
-              </span>
             </p>
           </div>
         </div>
