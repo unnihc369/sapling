@@ -3,9 +3,15 @@ import styles, { layout } from "../style";
 import Button from "./Button";
 
 const FeatureCard = ({ icon, title, content, index }) => (
-  <div className={`flex flex-row p-6 rounded-[20px] ${index !== features.length - 1 ? "mb-6" : "mb-0"} feature-card`}>
-    <div className={`w-[64px] h-[64px] rounded-full ${styles.flexCenter} bg-dimBlue`}>
-      <img src={icon} alt="star" className="w-[50%] h-[50%] object-contain" />
+  <div
+    className={`flex flex-row p-6 rounded-[20px] ${
+      index !== features.length - 1 ? "mb-6" : "mb-0"
+    } feature-card`}
+  >
+    <div
+      className={`w-[64px] h-[64px] rounded-full ${styles.flexCenter} bg-dimGreen`}
+    >
+      <img src={icon} alt="icon" className="w-[50%] h-[50%] object-contain" />
     </div>
     <div className="flex-1 flex flex-col ml-3">
       <h4 className="font-poppins font-semibold text-white text-[18px] leading-[23.4px] mb-1">
@@ -18,17 +24,14 @@ const FeatureCard = ({ icon, title, content, index }) => (
   </div>
 );
 
-const Business = () =>  (
+const Farms = () => (
   <section id="features" className={layout.section}>
     <div className={layout.sectionInfo}>
-      <h2 className={styles.heading2}>
-        You do the business, <br className="sm:block hidden" /> we’ll handle
-        the money.
-      </h2>
+      <h2 className={styles.heading2}>Welcome to Sapling Farms</h2>
       <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
-        With the right credit card, you can improve your financial life by
-        building credit, earning rewards and saving money. But with hundreds
-        of credit cards on the market.
+        Explore the world of farming with Sapling Farms. Enhance your
+        agricultural journey with our wide range of features, designed to make
+        farming easier and more rewarding.
       </p>
 
       <Button styles={`mt-10`} />
@@ -42,4 +45,4 @@ const Business = () =>  (
   </section>
 );
 
-export default Business;
+export default Farms;

@@ -47,26 +47,26 @@ export const feedback = [
   {
     id: "feedback-1",
     content:
-      "Money is only a tool. It will take you wherever you wish, but it will not replace you as the driver.",
-    name: "Herman Jensen",
-    title: "Founder & Leader",
+      "Our soil is our wealth, and with Sapling, we nurture it to grow healthy crops that sustain communities.",
+    name: "Farm Owner 1",
+    title: "Sustainable Agriculture Expert",
     img: people01,
   },
   {
     id: "feedback-2",
     content:
-      "Money makes your life easier. If you're lucky to have it, you're lucky.",
-    name: "Steve Mark",
-    title: "Founder & Leader",
-    img: people02,
+      "In the world of farming, Sapling is the key to making your life easier and your harvest bountiful.",
+    name: "Farm Owner 2",
+    title: "Crop Cultivation Specialist",
+    img: people01,
   },
   {
     id: "feedback-3",
     content:
-      "It is usually people in the money business, finance, and international trade that are really rich.",
-    name: "Kenn Gallagher",
-    title: "Founder & Leader",
-    img: people03,
+      "At Sapling, we believe that true richness lies in the health and prosperity of our farms and the people they feed.",
+    name: "Farm Owner 3",
+    title: "Agribusiness Visionary",
+    img: people01,
   },
 ];
 
@@ -78,7 +78,7 @@ export const stats = [
   },
   {
     id: "stats-2",
-    title: "Trusted by Company",
+    title: "Trusted Farms",
     value: "230+",
   },
   {
