@@ -12,7 +12,7 @@ const Navbar = () => {
    const {user}=UserState();
   return (
     <motion.nav className="w-full flex py-6 justify-between items-center navbar">
-      <img src={logo} alt="hoobank" className="w-[124px] h-[32px]" />
+      <h1 className="text-white font-extrabold text-xl">Sapling</h1>
 
       {user ? (
         <ul className="list-none sm:flex hidden justify-end items-center flex-1">
