@@ -29,6 +29,8 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
       ToastSuccess("SignUp successfully");
       navigate("/");
+      window.location.reload();
+
     } catch (error) {
       if (error.code === "auth/user-not-found") {
         ToastError("There is no user with this email ");
