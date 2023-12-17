@@ -40,6 +40,7 @@ const Signup = () => {
       await createUserWithEmailAndPassword(auth, email, password);
       ToastSuccess("SignUp successfully");
       navigate("/profile");
+       window.location.reload();
     } catch (error) {
       ToastError(error.message);
       // this for our developer usage
