@@ -1,4 +1,3 @@
-// src/components/Profile.js
 import React from "react";
 import { UserState } from "../context/UserContext";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -7,10 +6,8 @@ import { auth } from "../Firebase";
 import { ToastError, ToastSuccess } from "../utility/Toasts";
 
 const Profile = () => {
-
-  // context get userinfo
-
-   const {user,setUser}=UserState();
+  const { user, setUser } = UserState();
+  const navigate = useNavigate();
 
   const callouts = [
     {
@@ -40,65 +37,64 @@ const Profile = () => {
       href: "#",
     },
   ];
-   const naviagete = useNavigate();
-   const signOutUser = async (e) => {
-    e.preventDefault();
-     await signOut(auth)
-       .then(() => {
-         setUser(null);
 
-         naviagete("/");
-         window.location.reload();
-         ToastSuccess("SingOut successfully");
-       })
-       .catch((error) => {
-         ToastError("There is the error with singout");
-       });
-   };
+  const signOutUser = async (e) => {
+    e.preventDefault();
+    try {
+      await signOut(auth);
+      setUser(null);
+      navigate("/");
+      window.location.reload();
+      ToastSuccess("SignOut successful");
+    } catch (error) {
+      ToastError("There was an error with signout");
+    }
+  };
+
   return (
     <div className="container mx-auto mt-8">
       <div className="flex flex-col items-center justify-center lg:flex-row">
-        <div className="mb-4 lg:mb-0 lg:mr-8 bg-gray-200 p-8 rounded-full">
+        <div className="mb-4 lg:mb-0 lg:mr-8 bg-gray-200 p-1 rounded-full overflow-hidden">
           <img
             src={user.photoUrl}
             alt="Profile"
-            className="rounded-full h-20 w-20 object-cover"
+            className="rounded-full h-28 w-28 object-cover border-2 border-white"
           />
         </div>
         <div>
           <h1 className="text-3xl font-bold">{user.name}</h1>
           <p className="text-gray-600 mb-2">{user.email}</p>
           <p className="text-gray-600 mb-2">{user.phone}</p>
-          <p className="text-gray-600 mb-2">
-            isVerified:{user.isVerified ? "true" : "false"}
-          </p>
         </div>
       </div>
 
-      <div className="m-4">
-        {/* <h2 className="text-2xl font-bold">Followers</h2>
-        <p className="text-gray-600">Followed by 500 people</p> */}
-        {/* Display followers */}
+      <div className="flex space-x-4">
         <NavLink to="/editpro">
-          <button style={{ border: "1px solid" }}>{user.userId?"Edit Profile":"Add Info"}</button>
+          <button className="btn-primary bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring focus:border-blue-300">
+            {user.userId ? "Edit Profile" : "Add Info"}
+          </button>
         </NavLink>
         <NavLink to="/addFarm">
-          <button style={{ border: "1px solid" }}>add Farm</button>
+          <button className="btn-primary bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring focus:border-green-300">
+            Add Farm
+          </button>
         </NavLink>
-        <button style={{ color: "red" }} onClick={signOutUser}>
-          sign Out
+        <button
+          className="btn-danger bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring focus:border-red-300"
+          onClick={signOutUser}
+        >
+          Sign Out
         </button>
       </div>
 
-      {/* make good css here  */}
-      <div>
-        <p>address:{user.address}</p>
-        <p>about:{user.about}</p>
+      <div className="py-2">
+        <p>Address: {user.address}</p>
+        <p>About: {user.about}</p>
       </div>
 
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-2xl py-6 lg:max-w-none">
-          <h2 className="text-2xl font-bold text-gray-900">Collections</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Farms</h2>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
             {callouts.map((callout) => (
