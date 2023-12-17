@@ -1,60 +1,81 @@
 // src/components/Profile.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { UserState } from "../context/UserContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "../Firebase";
+import { auth, db } from "../firebase";
 import { ToastError, ToastSuccess } from "../utility/Toasts";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { Navbar } from "../components";
 
 const Profile = () => {
-
   // context get userinfo
 
-   const {user,setUser}=UserState();
+  const { user, setUser, SetblogFarm } = UserState();
+  const [cltFarms, SetCltFarms] = useState([]);
 
-  const callouts = [
-    {
-      name: "Desk and Office",
-      description: "Work from home accessories",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/home-page-02-edition-01.jpg",
-      imageAlt:
-        "Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug.",
-      href: "#",
-    },
-    {
-      name: "Self-Improvement",
-      description: "Journals and note-taking",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/home-page-02-edition-02.jpg",
-      imageAlt:
-        "Wood table with porcelain mug, leather journal, brass pen, leather key ring, and a houseplant.",
-      href: "#",
-    },
-    {
-      name: "Travel",
-      description: "Daily commute essentials",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/home-page-02-edition-03.jpg",
-      imageAlt: "Collection of four insulated travel bottles on wooden shelf.",
-      href: "#",
-    },
-  ];
-   const naviagete = useNavigate();
-   const signOutUser = async (e) => {
+ 
+  const naviagete = useNavigate();
+  const signOutUser = async (e) => {
     e.preventDefault();
-     await signOut(auth)
-       .then(() => {
-         setUser(null);
+    await signOut(auth)
+      .then(() => {
+        setUser(null);
 
-         naviagete("/");
-         window.location.reload();
-         ToastSuccess("SingOut successfully");
-       })
-       .catch((error) => {
-         ToastError("There is the error with singout");
-       });
-   };
+        naviagete("/");
+        window.location.reload();
+        ToastSuccess("SingOut successfully");
+      })
+      .catch((error) => {
+        ToastError("There is the error with singout");
+      });
+  };
+
+  const getAllfarms = async (user) => {
+   
+    if (user.isFarmer === "true") {
+      const q = query(
+        collection(db, "farm"),
+        where("farmerId", "==", user.userId)
+      );
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs;
+
+      return data.map((el) => {
+        if (el.data().userId) {
+          return el;
+        }
+      });
+    } else {
+      console.log("this is not farmer");
+      const q = query(
+        collection(db, "farm"),
+        where("userId", "==", user.userId)
+      );
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs;
+
+      return data.map((el) => {
+        if (el.data().userId) {
+          return el;
+        }
+      });
+    }
+  };
+  useEffect(() => {
+    if (user.userId) {
+     
+      
+      (async () => {
+       
+        
+        const data = await getAllfarms(user);
+        SetCltFarms(data);
+      })();
+    }
+  }, []);
+
+  console.log(cltFarms);
   return (
     <div className="container mx-auto mt-8">
       <div className="flex flex-col items-center justify-center lg:flex-row">
@@ -80,12 +101,26 @@ const Profile = () => {
         <p className="text-gray-600">Followed by 500 people</p> */}
         {/* Display followers */}
         <NavLink to="/editpro">
-          <button style={{ border: "1px solid" }}>{user.userId?"Edit Profile":"Add Info"}</button>
+          <button
+            style={{ border: "1px solid", marginRight: "5px" }}
+            className="py-2 px-6 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none undefined"
+          >
+            {user.userId ? "Edit Profile" : "Add Info"}
+          </button>
         </NavLink>
         <NavLink to="/addFarm">
-          <button style={{ border: "1px solid" }}>add Farm</button>
+          <button
+            style={{ border: "1px solid", marginRight: "5px" }}
+            className="py-2 px-6 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none undefined"
+          >
+            add Farm
+          </button>
         </NavLink>
-        <button style={{ color: "red" }} onClick={signOutUser}>
+        <button
+          style={{ color: "red", marginRight: "5px" }}
+          onClick={signOutUser}
+          className="py-2 px-6 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none undefined"
+        >
           sign Out
         </button>
       </div>
@@ -101,26 +136,35 @@ const Profile = () => {
           <h2 className="text-2xl font-bold text-gray-900">Collections</h2>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-            {callouts.map((callout) => (
-              <div key={callout.name} className="group relative">
-                <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
-                  <img
-                    src={callout.imageSrc}
-                    alt={callout.imageAlt}
-                    className="h-full w-full object-cover object-center"
-                  />
-                </div>
-                <h3 className="mt-6 text-sm text-gray-500">
-                  <a href={callout.href}>
-                    <span className="absolute inset-0" />
-                    {callout.name}
-                  </a>
-                </h3>
-                <p className="text-base font-semibold text-gray-900">
-                  {callout.description}
-                </p>
-              </div>
-            ))}
+            {cltFarms.length !== 0 &&
+              cltFarms.map(
+                (callout) =>
+                  callout && (
+                    <div
+                      key={callout.data().name}
+                      className="group relative"
+                      style={{ cursor: "pointer" }}
+                      onClick={(e)=>{
+                        e.preventDefault();
+                        SetblogFarm(callout);
+                        naviagete('/blog')
+                      }}
+                    >
+                      <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+                        <img
+                          src={callout.data().images.imageUrl}
+                          className="h-full w-full object-cover object-center"
+                        />
+                      </div>
+                      <h3 className="mt-6 text-sm text-gray-500">
+                        <p>farmer Name: {callout.data().farmerName}</p>
+                      </h3>
+                      <p className="text-base font-semibold text-gray-900">
+                        Customer Name : {callout.data().userName}
+                      </p>
+                    </div>
+                  )
+              )}
           </div>
         </div>
       </div>

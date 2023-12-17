@@ -1,6 +1,102 @@
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import {
+  ToastError,
+  ToastInfo,
+  ToastSuccess,
+  ToastWarning,
+} from "../utility/Toasts";
+import { db, storage } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { v4 } from "uuid";
+import { UserState } from "../context/UserContext";
+export default function FarmDetails() {
+  const [farmerName, SetfarmerName] = useState("");
+  const [equipments, Setequipments] = useState("");
+  const [CropsGrowthEarlier, SetCropsGrowthEarlier] = useState("");
+  const [addres, Setaddres] = useState("");
+  const [images, Setimages] = useState("");
+  const [typeOfSoil, SettypeOfSoil] = useState("");
+  const [farmSize, SetFarmSize] = useState("");
+  const [WaterSupply, SetWaterSupply] = useState("");
+  const [revenue, Setrevenue] = useState("");
+  const navigate = useNavigate();
 
-export default function FarmDetails(){
+  const {user}=UserState();
+
+  const handleSubmit = async (e) => {
+     e.preventDefault();
+    if (
+      !farmerName ||
+      !equipments ||
+      !images ||
+      !addres ||
+      !typeOfSoil ||
+      !WaterSupply ||
+      !revenue ||
+      !CropsGrowthEarlier ||
+      !farmerName
+    ) {
+      return ToastWarning("please provide all documents");
+    }
+
+    try {
+      const docRef = await addDoc(collection(db, "farm"), {
+        farmerName,
+        addres,
+        WaterSupply,
+        equipments,
+        typeOfSoil,
+        revenue,
+        images,
+        CropsGrowthEarlier,
+        farmSize,
+        farmerId:user.userId,
+      });
+      ToastSuccess("farm added successfully");
+      navigate("/");
+    } catch (error) {
+      ToastError(error.message);
+    }
+  };
+
+  const onChangeFIleUploadHandler = (File) => {
+    if (File === null) return;
+
+    if (File === undefined) return ToastWarning("plese select proper image!");
+    const blogRef = ref(storage, `farmPhotos/${File.name + v4()}`);
+
+    const uploadTask = uploadBytesResumable(blogRef, File);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        switch (snapshot.state) {
+          case "paused":
+            ToastError("upload paused");
+            break;
+          case "running":
+            // ToastInfo("Running");
+            console.log("running");
+            break;
+          default:
+            break;
+        }
+      },
+      (ere) => {
+        ToastError(ere.message);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+          ToastSuccess("Image upload successfull");
+          // setProgress(null);
+          Setimages((prev) => ({ ...prev, imageUrl: downloadUrl }));
+        });
+      }
+    );
+  };
   return (
     <form className="p-8">
       <div className="space-y-12 p-16">
@@ -30,6 +126,10 @@ export default function FarmDetails(){
                     autoComplete="username"
                     className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                     placeholder="janesmith"
+                    value={farmerName}
+                    onChange={(e) => {
+                      SetfarmerName(e.target.value);
+                    }}
                   />
                 </div>
               </div>
@@ -44,11 +144,14 @@ export default function FarmDetails(){
               </label>
               <div className="mt-2">
                 <textarea
-                  id="about"
+                  id="address"
                   name="about"
                   rows={3}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={""}
+                  value={addres}
+                  onChange={(e) => {
+                    Setaddres(e.target.value);
+                  }}
                 />
               </div>
               <p className="mt-3 text-sm leading-6 text-gray-600">
@@ -80,6 +183,9 @@ export default function FarmDetails(){
                         name="file-upload"
                         type="file"
                         className="sr-only"
+                        onChange={(e) => {
+                          onChangeFIleUploadHandler(e.target.files[0]);
+                        }}
                       />
                     </label>
                     <p className="pl-1">or drag and drop</p>
@@ -93,8 +199,7 @@ export default function FarmDetails(){
           </div>
         </div>
 
-        <div className="border-b border-gray-900/10 pb-12">     
-
+        <div className="border-b border-gray-900/10 pb-12">
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="sm:col-span-3">
               <label
@@ -110,6 +215,31 @@ export default function FarmDetails(){
                   id="first-name"
                   autoComplete="given-name"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={typeOfSoil}
+                  onChange={(e) => {
+                    SettypeOfSoil(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="sm:col-span-3">
+              <label
+                htmlFor="first-name"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Size of Farm
+              </label>
+              <div className="mt-2">
+                <input
+                  type="number"
+                  name="first-name"
+                  id="first-name"
+                  autoComplete="given-name"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={farmSize}
+                  onChange={(e) => {
+                    SetFarmSize(e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -128,6 +258,10 @@ export default function FarmDetails(){
                   id="last-name"
                   autoComplete="family-name"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={CropsGrowthEarlier}
+                  onChange={(e) => {
+                    SetCropsGrowthEarlier(e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -137,15 +271,17 @@ export default function FarmDetails(){
                 htmlFor="email"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Corps Under Growth
+                revenue
               </label>
               <div className="mt-2">
                 <input
-                  id="email"
                   name="email"
-                  type="email"
-                  autoComplete="email"
+                  type="number"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={revenue}
+                  onChange={(e) => {
+                    Setrevenue(e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -158,16 +294,15 @@ export default function FarmDetails(){
                 Equipment
               </label>
               <div className="mt-2">
-                <select
-                  id="country"
-                  name="country"
-                  autoComplete="country-name"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                >
-                  <option>Tractor</option>
-                  <option>JCB</option>
-                  <option>Mexico</option>
-                </select>
+                <input
+                  name="email"
+                  type="text"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={equipments}
+                  onChange={(e) => {
+                    Setequipments(e.target.value);
+                  }}
+                />
               </div>
             </div>
 
@@ -176,7 +311,7 @@ export default function FarmDetails(){
                 htmlFor="street-address"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Irrigation Type
+                Water Supply
               </label>
               <div className="mt-2">
                 <input
@@ -185,6 +320,10 @@ export default function FarmDetails(){
                   id="street-address"
                   autoComplete="street-address"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={WaterSupply}
+                  onChange={(e) => {
+                    SetWaterSupply(e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -244,19 +383,19 @@ export default function FarmDetails(){
             </div> */}
           </div>
         </div>
-
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button
-          type="button"
+        <NavLink
+          to={"/"}
           className="text-sm font-semibold leading-6 text-gray-900"
         >
           Cancel
-        </button>
+        </NavLink>
         <button
           type="submit"
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          onClick={handleSubmit}
         >
           Save
         </button>

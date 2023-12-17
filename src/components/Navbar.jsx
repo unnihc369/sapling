@@ -24,14 +24,18 @@ const Navbar = () => {
               } ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
               onClick={() => setActive(nav.title)}
             >
-              <a href={`/${nav.id}`}>{nav.title}</a>
+              {user.isFarmer === "true" && nav.id === "farms" ? (
+                <NavLink to={`/addfarm`}>addfarm</NavLink>
+              ) : (
+                <NavLink to={`/${nav.id}`}>{nav.title}</NavLink>
+              )}
             </li>
           ))}
         </ul>
       ) : (
         <ul className="list-none sm:flex hidden justify-end items-center flex-1">
           <li className="font-poppins font-normal cursor-pointer text-[16px] text-white">
-            <NavLink to={"/login"} >Login</NavLink>
+            <NavLink to={"/login"}>Login</NavLink>
           </li>
         </ul>
       )}

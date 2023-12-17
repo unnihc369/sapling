@@ -1,6 +1,6 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, db } from "../Firebase";
+import { auth, db } from "../firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 const UserContext = createContext();
@@ -11,7 +11,8 @@ export const UserState = () => useContext(UserContext);
 const UserProvider = (props) => {
   const [user, setUser] = useState({});
   const [load, setLoad] = useState(false);
-
+const [whichF, SetWhichF] = useState(null);
+const [blogFarm, SetblogFarm] = useState(null);
   const getuserInfo = async (user) => {
     const q = query(collection(db, "users"), where("userID", "==", user.uid));
     const querySnapshot = await getDocs(q);
@@ -25,7 +26,8 @@ const UserProvider = (props) => {
       photoUrl: data.photoUrl.imageUrl,
       address: data.address,
       isVerified: user.emailVerified,
-      about:data.about
+      about:data.about,
+      isFarmer:data.isFarmer
     });
   };
 
@@ -41,7 +43,18 @@ const UserProvider = (props) => {
   }, [load]);
 
   return (
-    <UserContext.Provider value={{ user, setUser ,load,setLoad}}>
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+        load,
+        setLoad,
+        whichF,
+        SetWhichF,
+        SetblogFarm,
+        blogFarm,
+      }}
+    >
       {props.children}
     </UserContext.Provider>
   );

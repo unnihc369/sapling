@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../Firebase";
+import { auth } from "../firebase";
 
 // this are toast to display warnings and informations
 import { ToastError, ToastSuccess, ToastWarning } from "../utility/Toasts";
-import { ToastContainer, toast } from "react-toastify";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -38,7 +37,7 @@ const Signup = () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       ToastSuccess("SignUp successfully");
-      navigate("/");
+      navigate("/profile");
     } catch (error) {
       ToastError(error.message);
       // this for our developer usage

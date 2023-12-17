@@ -12,6 +12,7 @@ import FarmDetails from "./pages/FarmDetails";
 import PaymentPage from "./pages/PaymentPage";
 import Blogs from "./pages/Blogs";
 import Blog from "./pages/Blog";
+import { Navbar } from "./components";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
         pauseOnHover
         theme="colored"
       />
+
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} exact />

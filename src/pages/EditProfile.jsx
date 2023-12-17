@@ -2,24 +2,25 @@ import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { UserState } from "../context/UserContext";
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
-import { db, storage } from "../Firebase";
+import { db, storage } from "../firebase";
 import { ToastError, ToastSuccess, ToastWarning } from "../utility/Toasts";
 import { useNavigate } from "react-router-dom";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import {v4} from 'uuid'
+import { v4 } from "uuid";
 export default function EditProfile() {
   const [name, SetName] = useState("");
   const [phone, SetPhone] = useState("");
   const [photo, SetPhoto] = useState("");
   const [about, SetAbout] = useState("");
   const [address, Setaddress] = useState("");
+  const [isFarmer, SetIsfarmer] = useState(false);
   const [ImageLoading, setImageLoading] = useState(false);
   const { user, setUser, setLoad, load } = UserState();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(user)
+    console.log(user);
     if (user.name) {
       SetName(user.name);
     }
@@ -34,6 +35,9 @@ export default function EditProfile() {
     }
     if (user.photo) {
       SetPhoto(user.photo);
+    }
+    if (user.isFarmer) {
+      SetIsfarmer(user.isFarmer);
     }
   }, [user]);
 
@@ -51,16 +55,15 @@ export default function EditProfile() {
           address: address,
           email: user.email,
           phone: phone,
-          photoUrl:
-            photo,
+          photoUrl: photo,
           userID: user.authId,
           username: name,
+          isFarmer,
         });
-        
-          setLoad(!load);
-          ToastSuccess("Your info updated successfull");
-          navigate("/profile");
-        
+
+        setLoad(!load);
+        ToastSuccess("Your info updated successfull");
+        navigate("/profile");
       } catch (error) {
         ToastError(error.message);
       }
@@ -70,62 +73,58 @@ export default function EditProfile() {
           about: about,
           address: address,
           phone: phone,
-          photoUrl:
-            photo,
+          photoUrl: photo,
           username: name,
+          isFarmer,
         });
-      
-          setLoad(!load);
-          ToastSuccess("Your info updated successfull");
-          navigate("/profile");
-        
+
+        setLoad(!load);
+        ToastSuccess("Your info updated successfull");
+        navigate("/profile");
       } catch (error) {
         ToastError(error.message);
       }
     }
   };
 
+  const onChangeFIleUploadHandler = (File) => {
+    if (File === null) return;
 
-    const onChangeFIleUploadHandler = (File) => {
-      if (File === null) return;
+    if (File === undefined) return ToastWarning("plese select proper image!");
+    setImageLoading(true);
+    const blogRef = ref(storage, `userPhotos/${File.name + v4()}`);
 
-      if (File === undefined) return ToastWarning("plese select proper image!");
-      setImageLoading(true);
-      const blogRef = ref(storage, `userPhotos/${File.name + v4()}`);
+    const uploadTask = uploadBytesResumable(blogRef, File);
 
-      const uploadTask = uploadBytesResumable(blogRef, File);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          switch (snapshot.state) {
-            case "paused":
-              ToastError("upload paused");
-              break;
-            case "running":
-              // ToastInfo("Running");
-              console.log("running");
-              break;
-            default:
-              break;
-          }
-        },
-        (ere) => {
-          ToastError(ere.message);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
-            ToastSuccess("Image upload successfull");
-            // setProgress(null);
-            SetPhoto((prev) => ({ ...prev, imageUrl: downloadUrl }));
-            setImageLoading(false);
-            
-          });
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        switch (snapshot.state) {
+          case "paused":
+            ToastError("upload paused");
+            break;
+          case "running":
+            // ToastInfo("Running");
+            console.log("running");
+            break;
+          default:
+            break;
         }
-      );
-    };
-    console.log(photo)
-
+      },
+      (ere) => {
+        ToastError(ere.message);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+          ToastSuccess("Image upload successfull");
+          // setProgress(null);
+          SetPhoto((prev) => ({ ...prev, imageUrl: downloadUrl }));
+          setImageLoading(false);
+        });
+      }
+    );
+  };
+  console.log(isFarmer);
 
   return (
     <form>
@@ -238,6 +237,24 @@ export default function EditProfile() {
                 Write a few sentences about yourself.
               </p>
             </div>
+            <div className="col-span-full">
+              <label
+                htmlFor="about"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Are you farmer?
+              </label>
+              <div className="mt-2">
+                <select
+                  value={isFarmer}
+                  onChange={(e) => SetIsfarmer(e.target.value)}
+                  className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                >
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+            </div>
 
             <div className="col-span-full">
               <label
@@ -258,7 +275,11 @@ export default function EditProfile() {
                     onChangeFIleUploadHandler(e.target.files[0]);
                   }}
                 />
-                <div className={`d-${ImageLoading?"flex":"none"} justify-content-center`} >
+                <div
+                  className={`d-${
+                    ImageLoading ? "flex" : "none"
+                  } justify-content-center`}
+                >
                   <div className="spinner-border" role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>

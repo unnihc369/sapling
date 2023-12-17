@@ -1,6 +1,73 @@
-import React from "react";
+import React, { useState } from "react";
+import { UserState } from "../context/UserContext";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { ToastError, ToastSuccess, ToastWarning } from "../utility/Toasts";
+import { useNavigate } from "react-router-dom";
 
 const PaymentPage = () => {
+  const [price, setPrice] = useState(10000);
+  const [cardNumber, setCardNumber] = useState("");
+  const [loading, Setloading] = useState(false);
+  const [securityCode, SetsecurityCode] = useState("");
+  const { whichF ,user} = UserState();
+
+  const navigate=useNavigate();
+
+  const handleSelectChange = (e) => {
+    // Handle the selected option, you can use the selected value to determine the price
+    const selectedOption = e.target.value;
+    // You can use the selected option value to update the price accordingly
+    // For simplicity, I'm using a placeholder variable here.
+
+    switch (selectedOption) {
+      case "oneMonth":
+        setPrice(10000);
+        break;
+      case "threeMonths":
+        setPrice(20000);
+        break;
+      case "sixMonths":
+        setPrice(30000);
+        break;
+      default:
+        price = 2000;
+        break;
+    }
+  };
+
+  const handlerSubscribe = async (e) => {
+   if(whichF){
+     e.preventDefault();
+     console.log(price, cardNumber, securityCode);
+     if (!price || !cardNumber || !securityCode) {
+       return ToastWarning("please provide all information");
+     }
+     if (cardNumber.toString().length != 16) {
+       return ToastWarning("invalid card number");
+     }
+     Setloading(true);
+     try {
+       const data = await updateDoc(doc(db, "farm", whichF.id), {
+         userId: user.userId,
+         duration:
+           price === 10000 ? "4 month" : price === 20000 ? "8 month" : "1 year",
+         amount: price,
+         userName:user.name,
+       });
+       Setloading(false);
+       ToastSuccess("subscription succee");
+       navigate('/profile');
+       
+     } catch (error) {
+       Setloading(false);
+       ToastError(error.message);
+     }
+   }else{
+    ToastError("please select the farm")
+   }
+  };
+
   return (
     <div className="relative mx-auto w-full bg-white">
       <div className="grid min-h-screen grid-cols-10">
@@ -24,6 +91,7 @@ const PaymentPage = () => {
                   name="email"
                   placeholder="john.capler@fang.com"
                   className="mt-1 block w-full rounded border-gray-300 bg-gray-50 py-3 px-4 text-sm placeholder-gray-300 shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500"
+                  value={user.email}
                 />
               </div>
               <div className="relative">
@@ -39,6 +107,10 @@ const PaymentPage = () => {
                   name="card-number"
                   placeholder="1234-5678-XXXX-XXXX"
                   className="block w-full rounded border-gray-300 bg-gray-50 py-3 px-4 pr-10 text-sm placeholder-gray-300 shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500"
+                  value={cardNumber}
+                  onChange={(e)=>{
+                    setCardNumber(e.target.value);
+                  }}
                 />
                 <img
                   src="/images/uQUFIfCYVYcLK0qVJF5Yw.png"
@@ -85,9 +157,31 @@ const PaymentPage = () => {
                       name="security-code"
                       placeholder="Security code"
                       className="block w-36 rounded border-gray-300 bg-gray-50 py-3 px-4 text-sm placeholder-gray-300 shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500"
+                      value={securityCode}
+                      onChange={(e)=>{
+                        SetsecurityCode(e.target.value);
+                      }}
                     />
                   </div>
                 </div>
+              </div>
+              <div className="mr-6 my-1">
+                <p className="text-xs font-semibold text-gray-500">
+                  Subscription Duration
+                </p>
+                <label htmlFor="subscription-duration" className="sr-only">
+                  Select subscription duration
+                </label>
+                <select
+                  name="subscription-duration"
+                  id="subscription-duration"
+                  onChange={handleSelectChange}
+                  className="cursor-pointer rounded border-gray-300 bg-gray-50 py-3 px-2 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500"
+                >
+                  <option value="oneMonth">Four Month</option>
+                  <option value="threeMonths">Eight Months</option>
+                  <option value="sixMonths"> one year</option>
+                </select>
               </div>
               <div>
                 <label htmlFor="card-name" className="sr-only">
@@ -99,22 +193,23 @@ const PaymentPage = () => {
                   name="card-name"
                   placeholder="Name on the card"
                   className="mt-1 block w-full rounded border-gray-300 bg-gray-50 py-3 px-4 text-sm placeholder-gray-300 shadow-sm outline-none transition focus:ring-2 focus:ring-teal-500"
+                  value={user.name}
+                 
                 />
               </div>
             </form>
-            <p className="mt-10 text-center text-sm font-semibold text-gray-500">
-              By placing this order you agree to the{" "}
-              <a
-                href="#"
-                className="whitespace-nowrap text-teal-400 underline hover:text-teal-600"
-              >
-                Terms and Conditions
-              </a>
-            </p>
+
             <button
               type="submit"
               className="mt-4 inline-flex w-full items-center justify-center rounded bg-teal-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-teal-500 sm:text-lg"
+              onClick={handlerSubscribe}
             >
+              <span
+                class="spinner-border  spinner-grow-sm"
+                aria-hidden="true"
+                style={{display:`${loading?"flex":"none"}`}}
+              ></span>
+              
               Place Order
             </button>
           </div>
@@ -130,58 +225,15 @@ const PaymentPage = () => {
             <div className="absolute inset-0 h-full w-full bg-gradient-to-t from-teal-800 to-teal-400 opacity-95"></div>
           </div>
           <div className="relative">
-            <ul className="space-y-5">
-              <li className="flex justify-between">
-                <div className="inline-flex">
-                  <img
-                    src="https://images.unsplash.com/photo-1620331311520-246422fd82f9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGhhaXIlMjBkcnllcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                    alt=""
-                    className="max-h-16"
-                  />
-                  <div className="ml-3">
-                    <p className="text-base font-semibold text-white">
-                      Nano Titanium Hair Dryer
-                    </p>
-                    <p className="text-sm font-medium text-white text-opacity-80">
-                      Pdf, doc Kindle
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm font-semibold text-white">$260.00</p>
-              </li>
-              <li className="flex justify-between">
-                <div className="inline-flex">
-                  <img
-                    src="https://images.unsplash.com/photo-1621607512214-68297480165e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjV8fGhhaXIlMjBkcnllcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                    alt=""
-                    className="max-h-16"
-                  />
-                  <div className="ml-3">
-                    <p className="text-base font-semibold text-white">
-                      Luisia H35
-                    </p>
-                    <p className="text-sm font-medium text-white text-opacity-80">
-                      Hair Dryer
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm font-semibold text-white">$350.00</p>
-              </li>
-            </ul>
-            <div className="my-5 h-0.5 w-full bg-white bg-opacity-30"></div>
             <div className="space-y-2">
               <p className="flex justify-between text-lg font-bold text-white">
                 <span>Total price:</span>
-                <span>$510.00</span>
-              </p>
-              <p className="flex justify-between text-sm font-medium text-white">
-                <span>Vat: 10%</span>
-                <span>$55.00</span>
+                <span>{price}</span>
               </p>
             </div>
           </div>
           <div className="relative mt-10 text-white">
-            <h3 className="mb-5 text-lg font-bold">Support</h3>
+            <h3 className="mb-2 text-lg font-bold">Support</h3>
             <p className="text-sm font-semibold">
               +01 653 235 211{" "}
               <span className="font-light">(International)</span>
@@ -191,16 +243,6 @@ const PaymentPage = () => {
             </p>
             <p className="mt-2 text-xs font-medium">
               Call us now for payment-related issues
-            </p>
-          </div>
-          <div className="relative mt-10 flex">
-            <p className="flex flex-col">
-              <span className="text-sm font-bold text-white">
-                Money Back Guarantee
-              </span>
-              <span className="text-xs font-medium text-white">
-                within 30 days of purchase
-              </span>
             </p>
           </div>
         </div>
