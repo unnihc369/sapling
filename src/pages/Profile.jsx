@@ -6,7 +6,8 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { ToastError, ToastSuccess } from "../utility/Toasts";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { Navbar } from "../components";
+import Header from "../components/Header";
+import Footer from "../components/Footer"
 
 const Profile = () => {
   // context get userinfo
@@ -71,98 +72,91 @@ const Profile = () => {
 
   console.log(cltFarms);
   return (
-    <div className="container mx-auto mt-8">
-      <div className="flex flex-col items-center justify-center lg:flex-row">
-        <div className="mb-4 lg:mb-0 lg:mr-8 bg-gray-200 p-8 rounded-full">
-          <img
-            src={user.photoUrl}
-            alt="Profile"
-            className="rounded-full h-20 w-20 object-cover"
-          />
+    <>
+      <Header />
+      <div className="container mx-auto mt-32">
+        <div className="flex flex-col items-center justify-center lg:flex-row">
+          <div className="mb-4 lg:mb-0 lg:mr-8 bg-gray-200 p-1 rounded-full overflow-hidden">
+            <img
+              src={user.photoUrl}
+              alt="Profile"
+              className="rounded-full h-28 w-28 object-cover border-2 border-white"
+            />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">{user.name}</h1>
+            <p className="text-gray-600 mb-2">{user.email}</p>
+            <p className="text-gray-600 mb-2">{user.phone}</p>
+          </div>
         </div>
+
+        <div className="flex space-x-4">
+          <NavLink to="/editpro">
+            <button className="btn-primary bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring focus:border-blue-300">
+              {user.userId ? "Edit Profile" : "Add Info"}
+            </button>
+          </NavLink>
+          <NavLink to="/addFarm">
+            <button className="btn-primary bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring focus:border-green-300">
+              Add Farm
+            </button>
+          </NavLink>
+          <button
+            className="btn-danger bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring focus:border-red-300"
+            onClick={signOutUser}
+          >
+            Sign Out
+          </button>
+        </div>
+
+        {/* make good css here  */}
         <div>
-          <h1 className="text-3xl font-bold">{user.name}</h1>
-          <p className="text-gray-600 mb-2">{user.email}</p>
-          <p className="text-gray-600 mb-2">{user.phone}</p>
-          <p className="text-gray-600 mb-2">
-            isVerified:{user.isVerified ? "true" : "false"}
-          </p>
+          <p>address:{user.address}</p>
+          <p>about:{user.about}</p>
         </div>
-      </div>
 
-      <div className="m-4">
-        {/* <h2 className="text-2xl font-bold">Followers</h2>
-        <p className="text-gray-600">Followed by 500 people</p> */}
-        {/* Display followers */}
-        <NavLink to="/editpro">
-          <button
-            style={{ border: "1px solid", marginRight: "5px" }}
-            className="py-2 px-6 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none undefined"
-          >
-            {user.userId ? "Edit Profile" : "Add Info"}
-          </button>
-        </NavLink>
-        <NavLink to="/addFarm">
-          <button
-            style={{ border: "1px solid", marginRight: "5px" }}
-            className="py-2 px-6 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none undefined"
-          >
-            add Farm
-          </button>
-        </NavLink>
-        <button
-          style={{ color: "red", marginRight: "5px" }}
-          onClick={signOutUser}
-          className="py-2 px-6 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none undefined"
-        >
-          sign Out
-        </button>
-      </div>
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-2xl py-6 lg:max-w-none">
+            <h2 className="text-2xl font-bold text-gray-900">Collections</h2>
 
-      {/* make good css here  */}
-      <div>
-        <p>address:{user.address}</p>
-        <p>about:{user.about}</p>
-      </div>
-
-      <div className="mx-auto max-w-7xl">
-        <div className="mx-auto max-w-2xl py-6 lg:max-w-none">
-          <h2 className="text-2xl font-bold text-gray-900">Collections</h2>
-
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-            {cltFarms.length !== 0 &&
-              cltFarms.map(
-                (callout) =>
-                  callout && (
-                    <div
-                      key={callout.data().name}
-                      className="group relative"
-                      style={{ cursor: "pointer" }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        SetblogFarm(callout);
-                        naviagete("/blog");
-                      }}
-                    >
-                      <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
-                        <img
-                          src={callout.data().images.imageUrl}
-                          className="h-full w-full object-cover object-center"
-                        />
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+              {cltFarms.length !== 0 &&
+                cltFarms.map(
+                  (callout) =>
+                    callout && (
+                      <div
+                        key={callout.data().name}
+                        className="group relative"
+                        style={{ cursor: "pointer" }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          SetblogFarm(callout);
+                          naviagete("/blog");
+                        }}
+                      >
+                        <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+                          <img
+                            src={callout.data().images.imageUrl}
+                            className="h-full w-full object-cover object-center"
+                          />
+                        </div>
+                        <h3 className="mt-6 text-sm text-gray-500">
+                          <p>farmer Name: {callout.data().farmerName}</p>
+                        </h3>
+                        <p className="text-base font-semibold text-gray-900">
+                          Customer Name : {callout.data().userName}
+                        </p>
                       </div>
-                      <h3 className="mt-6 text-sm text-gray-500">
-                        <p>farmer Name: {callout.data().farmerName}</p>
-                      </h3>
-                      <p className="text-base font-semibold text-gray-900">
-                        Customer Name : {callout.data().userName}
-                      </p>
-                    </div>
-                  )
-              )}
+                    )
+                )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <div className="bg-gray-500 p-6">
+        <Footer />
+      </div>
+    </>
   );
 };
 
