@@ -63,7 +63,11 @@ const Navbar = () => {
                   } ${index === navLinks.length - 1 ? "mb-0" : "mb-4"}`}
                   onClick={() => setActive(nav.title)}
                 >
-                  <NavLink to={`/${nav.id}`}>{nav.title}</NavLink>
+                  <NavLink to={`/${nav.id}`}>{nav.title}</NavLink>{user.isFarmer === "true" && nav.id === "farms" ? (
+                    <NavLink to={`/addfarm`}>addfarm</NavLink>
+                  ) : (
+                    <NavLink to={`/${nav.id}`}>{nav.title}</NavLink>
+                  )}
                 </li>
               ))}
             </ul>
